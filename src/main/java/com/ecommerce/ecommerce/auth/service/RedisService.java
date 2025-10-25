@@ -2,6 +2,9 @@ package com.ecommerce.ecommerce.auth.service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -16,54 +19,93 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class RedisService {
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public RedisService(RedisTemplate<String, String> redisTemplate) {
+    public RedisService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
     /*
      *Token'ı Redis'e kaydetme işlemi
-     * @param token -> JWT token
      * @param ttl -> Token'ın geçerlilik süresi (milisaniye)
-     *
+     * @param metadata Ek bilgiler (device, IP vs.)
      */
-    public void saveToken(String userId, String token, long ttl){
-        String key = generateKey(userId);
-        redisTemplate.opsForValue().set(key, token, ttl, TimeUnit.MILLISECONDS);
+    public void saveSession(String userId, String accessToken, String refreshToken, Map<String, String> metadata, long ttl){
+
+        String key = generateSessionKey(userId);
+
+        Map<String,String> sessionData = new HashMap<>();
+        sessionData.put("accessToken",accessToken);
+        sessionData.put("refreshToken",refreshToken);
+        sessionData.put("userId",userId);
+        sessionData.put("loginTime", LocalDateTime.now().toString());
+        sessionData.put("lastActivity", LocalDateTime.now().toString());
+
+        // Metadata ekleme (device, IP vs.)
+        if (metadata != null){
+            sessionData.putAll(metadata);
+        }
+
+        // Hash'i redis'e kaydeder
+        redisTemplate.opsForHash().putAll(key, sessionData);
+
+        //TTL ayarlanır (refresh token süresi kadar)
+        redisTemplate.expire(key, ttl, TimeUnit.MILLISECONDS);
+    }
+    public String getAccessToken(String userId){
+        String key = generateSessionKey(userId);
+        Object token = redisTemplate.opsForHash().get(key,"accessToken");
+        return token != null ? token.toString() : null;
     }
 
-    /*
-     * Redis'ten token okuma işlemi
-     * @return Token (varsa), yoksa null
-     */
-    public String getToken(String userId){
-        String key = generateKey(userId);
-        return redisTemplate.opsForValue().get(key);
+    public String getRefreshToken(String userId){
+        String key = generateSessionKey(userId);
+        Object token = redisTemplate.opsForHash().get(key, "refreshToken");
+        return token != null ? token.toString() : null;
     }
 
-    public void deleteToken(String userId){
-        String key = generateKey(userId);
+    public Map<Object, Object> getSession(String userId){
+        String key = generateSessionKey(userId);
+        return redisTemplate.opsForHash().entries(key);
+    }
+
+    public void updateAccessToken (String userId,String newAccessToken){
+        String key = generateSessionKey(userId);
+        redisTemplate.opsForHash().put(key,"accessToken",newAccessToken);
+        redisTemplate.opsForHash().put(key,"newAccessToken",newAccessToken);
+        redisTemplate.opsForHash().put(key,"lastActivity",LocalDateTime.now().toString());
+    }
+
+    public void updateLastActivity(String userId){
+        String key = generateSessionKey(userId);
+        redisTemplate.opsForHash().put(key, "lastActivity",LocalDateTime.now().toString());
+    }
+
+    public void deleteSession(String userId){
+        String key = generateSessionKey(userId);
         redisTemplate.delete(key);
     }
-
-    /*
-     * Token geçerlilik kontrolü
-     */
-    public boolean isTokenValid(String userId, String token){
-        String storedToken = getToken(userId);
+    public boolean isAccessTokenValid(String userId, String token){
+        String storedToken = getAccessToken(userId);
         return storedToken != null && storedToken.equals(token);
     }
 
-    /*
-     * Token'ın kalan süresini öğrenme
-     */
-    public Long getTokenExpiration(String userId){
-        String key = generateKey(userId);
-        return redisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+    public boolean isRefreshTokenValid(String userId, String token){
+        String storedToken = getRefreshToken(userId);
+        return storedToken != null && storedToken.equals(token);
     }
 
-    private String generateKey(String userId){
-        return "user:" + userId + ":token";
+    public Long getSessionExpiration(String userId){
+        String key = generateSessionKey(userId);
+        return redisTemplate.getExpire(key,TimeUnit.MILLISECONDS);
+    }
+
+    public boolean sessionExists(String userId){
+        String key = generateSessionKey(userId);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    private String generateSessionKey(String userId){
+        return "user:" + userId + ":session";
     }
 }
