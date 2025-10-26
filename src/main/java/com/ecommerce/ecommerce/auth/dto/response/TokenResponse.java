@@ -1,12 +1,14 @@
 package com.ecommerce.ecommerce.auth.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenResponse {
     private String accessToken;
     private String refreshToken;
-    private Long expiresIn; // access token expiration time in milliseconds
+    private String tokenType = "Bearer";
+    private Long expiresIn;
 }

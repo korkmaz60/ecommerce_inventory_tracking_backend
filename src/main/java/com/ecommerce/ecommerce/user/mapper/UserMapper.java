@@ -9,11 +9,14 @@ import org.mapstruct.Mapping;
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "active", constant = "true")
-    @Mapping(target = createdAt, ignore = true)
+    @Mapping(target = "active", expression = "java(true)")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "role", ignore = true)
     User toEntity(RegisterRequest request);
 
-    userResponse toDto(User user);
+    // UserResponse toDto(User user);  // TODO: UserResponse sınıfı yoksa kaldırıldı
 
 
 }

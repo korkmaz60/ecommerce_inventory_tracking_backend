@@ -72,7 +72,6 @@ public class RedisService {
     public void updateAccessToken (String userId,String newAccessToken){
         String key = generateSessionKey(userId);
         redisTemplate.opsForHash().put(key,"accessToken",newAccessToken);
-        redisTemplate.opsForHash().put(key,"newAccessToken",newAccessToken);
         redisTemplate.opsForHash().put(key,"lastActivity",LocalDateTime.now().toString());
     }
 

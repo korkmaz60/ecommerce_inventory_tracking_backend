@@ -1,8 +1,26 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ecommerce_postgres
+    environment:
+      POSTGRES_DB: ecommerce_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1453
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
   redis:
-    image: redis:7-alpine #Redis'in hafif versiyonu
+    image: redis:7-alpine
     container_name: ecommerce_redis
     ports:
       - "6379:6379"
@@ -17,5 +35,6 @@ services:
       retries: 3
 
 volumes:
-    redis_data: #Veriler container silinse bile kaybolmasın
+    postgres_data:
+    redis_data:
 
