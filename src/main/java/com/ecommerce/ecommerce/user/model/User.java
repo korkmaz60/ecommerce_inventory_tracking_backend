@@ -57,7 +57,7 @@ public class User {
         this.role = role;
     }
 
-    // Getters and Setters
+    // Getters ve Setters
     public Long getId() {
         return id;
     }

@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponse {
+public class CategoryResponse {
 
     private Long id;
 
@@ -20,25 +20,17 @@ public class ProductResponse {
 
     private String description;
 
-    private String sku;
+    private String slug;
 
-    private Long categoryId;
+    private Long parentId;
 
-    private String categoryName;
+    private String parentName;
 
-    private String imageUrl;
-
-    private BigDecimal price;
-
-    private BigDecimal discountPrice;
-
-    private String currency;
-
-    private Integer stock;
-
-    private Boolean inStock;
+    private List<CategoryResponse> subCategories;
 
     private Boolean active;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

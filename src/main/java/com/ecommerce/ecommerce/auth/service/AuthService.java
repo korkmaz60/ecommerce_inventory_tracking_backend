@@ -6,6 +6,9 @@ import com.ecommerce.ecommerce.auth.dto.response.LoginResponse;
 import com.ecommerce.ecommerce.auth.dto.response.LogoutResponse;
 import com.ecommerce.ecommerce.auth.dto.response.RegisterResponse;
 import com.ecommerce.ecommerce.auth.dto.response.TokenResponse;
+import com.ecommerce.ecommerce.common.exception.DuplicateResourceException;
+import com.ecommerce.ecommerce.common.exception.UnauthorizedException;
+import com.ecommerce.ecommerce.common.exception.ValidationException;
 import com.ecommerce.ecommerce.user.model.Role;
 import com.ecommerce.ecommerce.user.model.User;
 import com.ecommerce.ecommerce.user.repository.UserRepository;
@@ -50,15 +53,15 @@ public class AuthService {
     public RegisterResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail())!= null) {
-            throw new RuntimeException("Bu e-posta zaten kullanılıyor.");
+            throw new DuplicateResourceException("Kullanıcı", "email", request.getEmail());
         }
 
         if (userRepository.findByPhone(request.getPhone())!= null) {
-            throw new RuntimeException("Bu telefon numarası zaten kullanılıyor.");
+            throw new DuplicateResourceException("Kullanıcı", "telefon", request.getPhone());
         }
 
         if(!request.getPassword().equals(request.getPasswordConfirm())) {
-            throw new RuntimeException("Şifreler eşleşmiyor.");
+            throw new ValidationException("Şifreler eşleşmiyor.");
         }
 
         User user = new User();
@@ -152,11 +155,11 @@ public class AuthService {
         }
 
         if (!jwtService.isTokenValid(refreshToken, userDetails)) {
-            throw new RuntimeException("Geçersiz refresh token.");
+            throw new UnauthorizedException("Geçersiz refresh token.");
         }
 
         if(!redisService.isRefreshTokenValid(user.getId().toString(), refreshToken)){
-            throw new RuntimeException("Refresh token Redis'te bulunamadı veya geçersiz.");
+            throw new UnauthorizedException("Refresh token Redis'te bulunamadı veya geçersiz.");
         }
 
         String newAccessToken = jwtService.generateToken(userDetails);
