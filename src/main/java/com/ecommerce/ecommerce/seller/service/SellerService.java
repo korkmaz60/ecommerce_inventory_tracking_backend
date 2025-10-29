@@ -49,10 +49,16 @@ public class SellerService {
 
         Seller seller = new Seller();
         seller.setUser(user);
+        seller.setSellerType(request.getSellerType() != null ? request.getSellerType() : seller.getSellerType());
         seller.setCompanyName(request.getCompanyName());
         seller.setTaxNumber(request.getTaxNumber());
         seller.setAddress(request.getAddress());
+        seller.setContactPhone(request.getContactPhone());
+        seller.setContactEmail(request.getContactEmail());
+        seller.setBusinessAddress(request.getBusinessAddress());
         seller.setIban(request.getIban());
+        seller.setBankName(request.getBankName());
+        seller.setAccountHolderName(request.getAccountHolderName());
         seller.setDescription(request.getDescription());
         seller.setStatus(SellerStatus.PENDING);
 
@@ -178,15 +184,26 @@ public class SellerService {
         SellerResponse response = new SellerResponse();
         response.setId(seller.getId());
         response.setUserId(seller.getUser().getId());
+        response.setSellerType(seller.getSellerType());
         response.setCompanyName(seller.getCompanyName());
         response.setTaxNumber(seller.getTaxNumber());
         response.setAddress(seller.getAddress());
+        response.setContactPhone(seller.getContactPhone());
+        response.setContactEmail(seller.getContactEmail());
+        response.setBusinessAddress(seller.getBusinessAddress());
         response.setIban(seller.getIban());
+        response.setBankName(seller.getBankName());
+        response.setAccountHolderName(seller.getAccountHolderName());
         response.setCommissionRate(seller.getCommissionRate());
         response.setStatus(seller.getStatus());
         response.setDescription(seller.getDescription());
         response.setLogoUrl(seller.getLogoUrl());
         response.setActive(seller.getActive());
+        response.setTotalOrders(seller.getTotalOrders());
+        response.setCompletedOrders(seller.getCompletedOrders());
+        response.setTotalRevenue(seller.getTotalRevenue());
+        response.setAverageRating(seller.getAverageRating());
+        response.setReviewCount(seller.getReviewCount());
         response.setCreatedAt(seller.getCreatedAt());
         response.setApprovedAt(seller.getApprovedAt());
         return response;

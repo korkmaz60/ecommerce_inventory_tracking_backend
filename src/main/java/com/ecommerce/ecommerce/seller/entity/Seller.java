@@ -17,6 +17,10 @@ public class Seller {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "seller_type", nullable = false, length = 20)
+    private SellerType sellerType = SellerType.INDIVIDUAL;
+
     @Column(nullable = false, length = 255)
     private String companyName;
 
@@ -26,8 +30,23 @@ public class Seller {
     @Column(columnDefinition = "TEXT")
     private String address;
 
+    @Column(name = "contact_phone", length = 20)
+    private String contactPhone;
+
+    @Column(name = "contact_email", length = 100)
+    private String contactEmail;
+
+    @Column(name = "business_address", columnDefinition = "TEXT")
+    private String businessAddress;
+
     @Column(length = 100, unique = true)
     private String iban;
+
+    @Column(name = "bank_name", length = 100)
+    private String bankName;
+
+    @Column(name = "account_holder_name", length = 255)
+    private String accountHolderName;
 
     @Column(precision = 5, scale = 2)
     private BigDecimal commissionRate = BigDecimal.valueOf(15.00);
@@ -53,6 +72,21 @@ public class Seller {
 
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
+
+    @Column(name = "total_orders")
+    private Integer totalOrders = 0;
+
+    @Column(name = "completed_orders")
+    private Integer completedOrders = 0;
+
+    @Column(name = "total_revenue", precision = 15, scale = 2)
+    private BigDecimal totalRevenue = BigDecimal.ZERO;
+
+    @Column(name = "average_rating", precision = 3, scale = 2)
+    private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @Column(name = "review_count")
+    private Integer reviewCount = 0;
 
     @PrePersist
     protected void onCreate() {
@@ -184,5 +218,93 @@ public class Seller {
 
     public void setApprovedAt(LocalDateTime approvedAt) {
         this.approvedAt = approvedAt;
+    }
+
+    public SellerType getSellerType() {
+        return sellerType;
+    }
+
+    public void setSellerType(SellerType sellerType) {
+        this.sellerType = sellerType;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public String getBusinessAddress() {
+        return businessAddress;
+    }
+
+    public void setBusinessAddress(String businessAddress) {
+        this.businessAddress = businessAddress;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getAccountHolderName() {
+        return accountHolderName;
+    }
+
+    public void setAccountHolderName(String accountHolderName) {
+        this.accountHolderName = accountHolderName;
+    }
+
+    public Integer getTotalOrders() {
+        return totalOrders;
+    }
+
+    public void setTotalOrders(Integer totalOrders) {
+        this.totalOrders = totalOrders;
+    }
+
+    public Integer getCompletedOrders() {
+        return completedOrders;
+    }
+
+    public void setCompletedOrders(Integer completedOrders) {
+        this.completedOrders = completedOrders;
+    }
+
+    public BigDecimal getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(BigDecimal totalRevenue) {
+        this.totalRevenue = totalRevenue;
+    }
+
+    public BigDecimal getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(BigDecimal averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Integer getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
     }
 }
