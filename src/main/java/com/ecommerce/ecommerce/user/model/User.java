@@ -1,5 +1,6 @@
 package com.ecommerce.ecommerce.user.model;
 
+import com.ecommerce.ecommerce.seller.entity.Seller;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -32,6 +33,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Seller seller;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -136,6 +140,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Seller getSeller() {
+        return seller;
+    }
+
+    public void setSeller(Seller seller) {
+        this.seller = seller;
     }
 
     // Lifecycle callbacks

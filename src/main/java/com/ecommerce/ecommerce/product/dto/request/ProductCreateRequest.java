@@ -27,6 +27,8 @@ public class ProductCreateRequest {
     @NotNull(message = "Kategori ID'si zorunludur")
     private Long categoryId;
 
+    private Long sellerId;
+
     private String imageUrl;
 
     private Boolean active;

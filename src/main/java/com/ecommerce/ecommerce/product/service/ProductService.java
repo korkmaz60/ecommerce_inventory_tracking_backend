@@ -7,6 +7,8 @@ import com.ecommerce.ecommerce.product.entity.Category;
 import com.ecommerce.ecommerce.product.entity.Product;
 import com.ecommerce.ecommerce.product.repository.CategoryRepository;
 import com.ecommerce.ecommerce.product.repository.ProductRepository;
+import com.ecommerce.ecommerce.seller.entity.Seller;
+import com.ecommerce.ecommerce.seller.repository.SellerRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final SellerRepository sellerRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, SellerRepository sellerRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.sellerRepository = sellerRepository;
     }
 
 
@@ -80,15 +84,21 @@ public class ProductService {
             throw new DuplicateResourceException("Ürün", "SKU", request.getSku());
         }
 
-        // Kategori kontrolü
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Kategori bulunamadı: " + request.getCategoryId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Kategori", "id", request.getCategoryId()));
+
+        Seller seller = null;
+        if (request.getSellerId() != null) {
+            seller = sellerRepository.findById(request.getSellerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Satıcı", "id", request.getSellerId()));
+        }
 
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setSku(request.getSku());
         product.setCategory(category);
+        product.setSeller(seller);
         product.setImageUrl(request.getImageUrl());
         product.setActive(request.getActive() != null ? request.getActive() : true);
 
@@ -185,6 +195,8 @@ public class ProductService {
                 .sku(product.getSku())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .sellerId(product.getSeller() != null ? product.getSeller().getId() : null)
+                .sellerName(product.getSeller() != null ? product.getSeller().getCompanyName() : null)
                 .imageUrl(product.getImageUrl())
                 .price(price)
                 .discountPrice(discountPrice)
