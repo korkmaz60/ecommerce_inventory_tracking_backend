@@ -10,26 +10,31 @@ public class OrderResponse {
     private Long id;
     private Long userId;
     private String orderNumber;
-    private LocalDateTime orderDate;
-    private String status;
     private BigDecimal totalAmount;
-    private BigDecimal shippingCost;
-    private BigDecimal taxAmount;
+    private BigDecimal shippingFee;
     private String shippingAddress;
-    private String billingAddress;
-    private String paymentMethod;
-    private String trackingNumber;
+    private String orderStatus;
+    private String paymentStatus;
+    private String notes;
     private List<OrderItemResponse> items;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+    private LocalDateTime paidAt;
+    private LocalDateTime shippedAt;
+    private LocalDateTime deliveredAt;
+
     @Data
     public static class OrderItemResponse {
         private Long id;
         private Long productId;
         private String productName;
+        private Long sellerId;
+        private String sellerName;
         private Integer quantity;
         private BigDecimal unitPrice;
-        private BigDecimal totalPrice;
+        private BigDecimal subtotal;
+        private BigDecimal commissionRate;
+        private BigDecimal commissionAmount;
+        private BigDecimal sellerAmount;
     }
 }
